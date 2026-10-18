@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Love Story ♡</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<style>
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #f5b4d7;
+  font-family: 'Press Start 2P', monospace;
+}
+
+#background {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    #ffb9df22,
+    #ffb9df33,
+    #24102b33
+  );
+}
+
+.content {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+  pointer-events: none;
+}
+
+#lyric {
+  width: min(90vw, 1100px);
+  min-height: 140px;
+  padding: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f4a9d45c;
+  border-radius: 12px;
+  color: white;
+  font-size: clamp(10px, 2.3vw, 22px);
+  line-height: 2;
+  text-shadow: 2px 2px #555, 0 0 6px #333;
+  transition: opacity .3s;
+}
+
+#lyric.fade { opacity: 0; }
+
+.controls {
+  position: fixed;
+  z-index: 5;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+button {
+  padding: 12px 15px;
+  border: 1px solid #fff;
+  border-radius: 8px;
+  background: #d97ebcbb;
+  color: white;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+button:hover { background: #c85c9f; }
+
+@media (max-width: 600px) {
+  #lyric {
+    width: 94vw;
+    min-height: 110px;
+    padding: 15px;
+    font-size: 11px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Ganti URL di bawah dengan URL video background Vidcode -->
+<video id="background" autoplay muted loop playsinline>
+  <source src="background.mp4" type="video/mp4">
+</video>
+
+<div class="overlay"></div>
+
+<div class="content">
+  <div id="lyric">Romeo, take me ♡</div>
+</div>
+
+<audio id="music" preload="auto" src="love-story.mp3"></audio>
+
+<div class="controls">
+  <button id="play">▶️ PUTAR LAGU</button>
+  <button id="pause">Ⅱ JEDA</button>
+  <button id="fullscreen">⛶ FULLSCREEN</button>
+</div>
+
+<script>
+const music = document.getElementById("music");
+const bg = document.getElementById("background");
+const lyric = document.getElementById("lyric");
+
+// Timestamp perkiraan. Sesuaikan dengan versi MP3 kamu.
+const lyrics = [
+  { time: 116, text: "Romeo, take me" },
+  { time: 119, text: "Somewhere we can be alone" },
+  { time: 121, text: "I'll be waiting" },
+  { time: 123, text: "All that's left to do is run" },
+  { time: 125, text: "You'll be the prince" },
+  { time: 127, text: "And I'll be the princess" },
+  { time: 129, text: "It's a love story" },
+  { time: 131, text: "Baby, just say yes ♡" }
+];
+
+let lastIndex = -1;
+let playingReff = false;
+
+function updateLyrics() {
+  const t = music.currentTime;
+  let index = -1;
+
+  lyrics.forEach((item, i) => {
+    if (t >= item.time) index = i;
+  });
+
+  if (index !== lastIndex) {
+  lyric.textContent =
+    index >= 0 ? lyrics[index].text : "♡";
+
+  lastIndex = index;
+}
+
+    lastIndex = index;
+  }
+
+  if (playingReff && t >= 81) {
+    music.pause();
+    playingReff = false;
+    document.getElementById("play").textContent =
+      "▶️ PUTAR LAGU";
+  }
+
+
+music.addEventListener("timeupdate", updateLyrics);
+
+document.getElementById("play").onclick = async () => {
+  try {
+    if (music.currentTime < 116 || music.currentTime >= 135) {
+      music.currentTime = 116;
+      lastIndex = -1;
+    }
+
+    bg.muted = true;
+    bg.play().catch(() => {});
+    await music.play();
+
+    playingReff = true;
+    document.getElementById("play").textContent =
+      "▶️ LAGU DIPUTAR";
+  } catch (e) {
+    lyric.textContent =
+      "Periksa URL file audio dan video ♡";
+  }
+
+};
+
+document.getElementById("pause").onclick = () => {
+  music.pause();
+  bg.pause();
+  playingReff = false;
+  document.getElementById("play").textContent =
+    "▶️ PUTAR LAGU";
+};
+
+document.getElementById("fullscreen").onclick = async () => {
+  try {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
+    } else {
+      await document.exitFullscreen();
+    }
+  } catch (e) {
+    console.log("Fullscreen tidak tersedia");
+  }
+};
+</script>
+
+</body>
+</html>
